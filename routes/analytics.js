@@ -182,6 +182,7 @@ router.post('/sales-upload', authenticateStoreManager, upload.single('file'), as
 
 // Get analytics dashboard data
 router.get('/dashboard', authenticateStoreManager, async (req, res) => {
+  console.log('Dashboard request received:', { query: req.query, user: req.user });
   try {
     const { start_date, end_date } = req.query;
     const storeId = req.user.storeId;
@@ -201,40 +202,82 @@ router.get('/dashboard', authenticateStoreManager, async (req, res) => {
     }
 
     // QR Scan Analytics
-    const [qrScanStats] = await pool.execute(
-      `SELECT 
+    console.log('Fetching QR scan analytics...');
+    let qrScanQuery = `
+      SELECT 
         COUNT(*) as total_scans,
         COUNT(DISTINCT DATE(scan_time)) as scan_days,
         COUNT(DISTINCT ip_address) as unique_visitors,
         COUNT(DISTINCT customer_id) as authenticated_scans
       FROM qr_scans 
-      WHERE store_id = ? ${dateFilter}`,
-      [storeId, ...dateParams]
-    );
+      WHERE store_id = ?
+    `;
+
+    // Add date filter if provided
+    if (dateFilter) {
+      qrScanQuery += ` AND DATE(scan_time) BETWEEN ? AND ?`;
+    }
+
+    console.log('Executing QR scan query:', qrScanQuery, { storeId, dateFilter, dateParams });
+    let qrScanStats;
+    try {
+      [qrScanStats] = await pool.execute(
+        qrScanQuery,
+        dateFilter ? [storeId, ...dateParams] : [storeId]
+      );
+      console.log('QR scan query results:', qrScanStats);
+    } catch (dbError) {
+      console.error('Database error in QR scan query:', dbError);
+      throw dbError;
+    }
 
     // Section-wise QR scans
-    const [sectionScans] = await pool.execute(
-      `SELECT 
+    let sectionScansQuery = `
+      SELECT 
         ss.name as section_name,
         COUNT(qs.id) as scan_count
       FROM store_sections ss
-      LEFT JOIN qr_scans qs ON ss.id = qs.section_id ${dateFilter ? 'AND DATE(qs.scan_time) BETWEEN ? AND ?' : ''}
+      LEFT JOIN qr_scans qs ON ss.id = qs.section_id 
       WHERE ss.store_id = ?
+    `;
+
+    // Add date filter if provided
+    if (dateFilter) {
+      sectionScansQuery += ` AND DATE(qs.scan_time) BETWEEN ? AND ?`;
+    }
+
+    sectionScansQuery += `
       GROUP BY ss.id, ss.name
-      ORDER BY scan_count DESC`,
-      dateFilter ? [...dateParams, storeId] : [storeId]
+      ORDER BY scan_count DESC
+    `;
+
+    const [sectionScans] = await pool.execute(
+      sectionScansQuery,
+      dateFilter ? [storeId, ...dateParams] : [storeId]
     );
 
     // Hourly scan distribution
-    const [hourlyScans] = await pool.execute(
-      `SELECT 
+    let hourlyScansQuery = `
+      SELECT 
         HOUR(scan_time) as hour,
         COUNT(*) as scan_count
       FROM qr_scans 
-      WHERE store_id = ? ${dateFilter}
+      WHERE store_id = ?
+    `;
+
+    // Add date filter if provided
+    if (dateFilter) {
+      hourlyScansQuery += ` AND DATE(scan_time) BETWEEN ? AND ?`;
+    }
+
+    hourlyScansQuery += `
       GROUP BY HOUR(scan_time)
-      ORDER BY hour`,
-      [storeId, ...dateParams]
+      ORDER BY hour
+    `;
+
+    const [hourlyScans] = await pool.execute(
+      hourlyScansQuery,
+      dateFilter ? [storeId, ...dateParams] : [storeId]
     );
 
     // Sales Analytics

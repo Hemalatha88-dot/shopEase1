@@ -14,6 +14,7 @@ const feedbackRoutes = require('./routes/feedback');
 const analyticsRoutes = require('./routes/analytics');
 const qrRoutes = require('./routes/qr');
 const userRoutes = require('./routes/users');
+const salesRoutes = require('./routes/sales');
 
 // Security middleware
 app.use(helmet());
@@ -35,6 +36,7 @@ app.use(limiter);
 
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001'], // Add all your frontend URLs
+  // origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -67,6 +69,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/qr', qrRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/sales', salesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

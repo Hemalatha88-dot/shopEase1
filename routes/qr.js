@@ -1,7 +1,8 @@
-// const express = require('express');
-// const QRCode = require('qrcode');
-// const { pool } = require('../config/database');
-// const { authenticateStoreManager } = require('../middleware/auth');
+const express = require('express');
+const QRCode = require('qrcode');
+const { pool } = require('../config/database');
+const { authenticateToken, authenticateStoreManager } = require('../middleware/auth');
+const router = express.Router();
 
 // const router = express.Router();
 
@@ -25,7 +26,10 @@
 //     }
 
 //     const store = stores[0];
-//     const qrData = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/store/${storeId}`;
+//     // Ensure we have a valid frontend URL
+//     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+//     const qrData = `${frontendUrl}/store/${storeId}`;
+//     console.log('Generating QR code with URL:', qrData); // Debug log
 
 //     // Generate QR code
 //     const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
@@ -378,12 +382,7 @@
 
 
 
-// In routes/qr.js
-const express = require('express');
-const router = express.Router();
-const { authenticateStoreManager } = require('../middleware/auth');
-const QRCode = require('qrcode');
-const { pool } = require('../config/database');
+
 
 // Generate main store QR
 // router.post('/store/:storeId/generate-main', authenticateStoreManager, async (req, res) => {
@@ -433,31 +432,55 @@ const { pool } = require('../config/database');
 // });
 
 
-// Example for generating main store QR
+// Generate main store QR code
 router.post('/store/:storeId/generate-main', authenticateToken, async (req, res) => {
   try {
     const { storeId } = req.params;
-    const { url } = req.body;
+    let { url } = req.body;
     
+    // If URL is not provided, use the default format
     if (!url) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'URL is required' 
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      url = `${frontendUrl}/store/${storeId}`;
+    }
+    
+    // Ensure the URL is properly formatted
+    try {
+      // If URL is just a path, prepend the frontend URL
+      if (url.startsWith('/')) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        url = `${frontendUrl}${url}`;
+      }
+      
+      // Ensure the URL has a protocol
+      if (!url.match(/^https?:\/\//)) {
+        url = `http://${url}`;
+      }
+    } catch (error) {
+      console.error('Error formatting URL:', error);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid URL format'
       });
     }
 
+    console.log('Generating QR code for URL:', url);
+    
     // Generate QR code
     const qrCode = await QRCode.toDataURL(url);
     
     // Save to database
-    await db.query(
+    await pool.query(
       'UPDATE stores SET qr_code_main = ? WHERE id = ?',
       [qrCode, storeId]
     );
 
     res.json({ 
       success: true, 
-      data: { qr_code: qrCode } 
+      data: { 
+        qr_code: qrCode,
+        url: url  // Return the final URL for debugging
+      } 
     });
   } catch (error) {
     console.error('Error generating QR:', error);
@@ -482,10 +505,21 @@ router.post('/store/:storeId/section/:sectionId/generate',
   async (req, res) => {
     try {
       const { storeId, sectionId } = req.params;
-      const sectionUrl = `${process.env.FRONTEND_URL}/store/${storeId}/section/${sectionId}`;
+      let { url } = req.body;
+      
+      // If URL is not provided, use the default format
+      if (!url) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        url = `${frontendUrl}/store/${storeId}/section/${sectionId}`;
+      }
+      
+      // Ensure the URL is properly formatted
+      if (!url.startsWith('http')) {
+        url = `http://${url}`;
+      }
       
       // Generate QR code
-      const qrCode = await QRCode.toDataURL(sectionUrl);
+      const qrCode = await QRCode.toDataURL(url);
       
       // Save to database
       await pool.query(
@@ -495,7 +529,10 @@ router.post('/store/:storeId/section/:sectionId/generate',
       
       res.json({
         success: true,
-        data: { qr_code: qrCode }
+        data: { 
+          qr_code: qrCode,
+          url: url  // Return the generated URL for debugging
+        }
       });
     } catch (error) {
       console.error('Generate section QR error:', error);

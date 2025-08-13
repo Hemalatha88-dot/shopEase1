@@ -36,4 +36,22 @@ connection.connect((err) => {
     
     connection.end();
   });
+
+
+
+  // test-db-connection.js
+const { pool } = require('./config/database');
+
+async function testConnection() {
+  try {
+    const [rows] = await pool.execute('SELECT 1 as test');
+    console.log('✅ Database connection successful!', rows);
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+  } finally {
+    process.exit();
+  }
+}
+
+testConnection();
 });

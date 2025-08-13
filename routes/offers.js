@@ -72,7 +72,7 @@ router.get('/', authenticateStoreManager, async (req, res) => {
 router.get('/store/:storeId', optionalAuth, async (req, res) => {
   try {
     const { storeId } = req.params;
-    const { section_id, category, limit = 10 } = req.query;
+    const { section_id, category, limit } = req.query;
     
     // Use simple query without prepared statements to avoid parameter issues
     let query = `
@@ -90,7 +90,12 @@ router.get('/store/:storeId', optionalAuth, async (req, res) => {
       query += ` AND o.category = '${category.replace(/'/g, "''")}'`; // Basic SQL injection protection
     }
 
-    query += ` ORDER BY o.created_at DESC LIMIT ${parseInt(limit)}`;
+    query += ' ORDER BY o.created_at DESC';
+    
+    // Only add LIMIT if it's explicitly provided
+    if (limit) {
+      query += ` LIMIT ${parseInt(limit)}`;
+    }
 
     console.log('Executing query:', query);
 

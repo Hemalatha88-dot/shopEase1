@@ -108,7 +108,8 @@ const StoreSections = () => {
 
   const generateQRCode = (sectionId) => {
     // Generate QR code for section-specific offers
-    const qrUrl = `${window.location.origin}/offers/${user?.storeId}/section/${sectionId}`;
+    const frontendUrl = process.env.REACT_APP_FRONTEND_URL || window.location.origin || 'http://localhost:3000';
+    const qrUrl = `${frontendUrl}/offers/${user?.storeId}/section/${sectionId}`;
     window.open(`/qr-generator?url=${encodeURIComponent(qrUrl)}&title=Section QR Code`, '_blank');
   };
 
@@ -253,13 +254,13 @@ const StoreSections = () => {
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <button
+                    {/* <button
                       onClick={() => generateQRCode(section.id)}
                       className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Generate QR Code"
                     >
                       <QrCodeIcon className="h-5 w-5" />
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => handleEdit(section)}
                       className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"

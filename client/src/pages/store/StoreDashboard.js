@@ -179,7 +179,7 @@ const StoreDashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="card">
+      {/* <div className="card">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
         <div className="space-y-4">
           <div className="flex items-center p-4 bg-gray-50 rounded-lg">
@@ -218,7 +218,7 @@ const StoreDashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

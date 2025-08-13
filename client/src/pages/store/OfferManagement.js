@@ -528,7 +528,7 @@ const OfferManagement = () => {
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <button
+                    {/* <button
                       onClick={() => toggleOfferStatus(offer.id, offer.is_active)}
                       className="text-gray-400 hover:text-gray-600"
                     >
@@ -537,7 +537,7 @@ const OfferManagement = () => {
                       ) : (
                         <EyeIcon className="h-5 w-5" />
                       )}
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => deleteOffer(offer.id)}
                       className="text-red-400 hover:text-red-600"
