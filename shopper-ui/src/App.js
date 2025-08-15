@@ -19,7 +19,9 @@ function App() {
         <div className="App min-h-screen bg-gray-50">
           <Routes>
             {/* Shopper Journey Routes */}
+            {/* <Route path="/" element={<StoreLanding />} /> */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/store/:storeId" element={<StoreLanding />} />
             <Route path="/offers/:storeId" element={<OfferCatalog />} />
             <Route path="/offers/:storeId/:sectionId" element={<OfferCatalog />} />

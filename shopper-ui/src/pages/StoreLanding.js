@@ -131,7 +131,7 @@ const StoreLanding = () => {
       </div>
 
       {/* Store Sections */}
-      {sections.length > 0 && (
+      {/* {sections.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Department</h2>
@@ -171,7 +171,7 @@ const StoreLanding = () => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Store Info Footer */}
       <div className="bg-gray-900 text-white">

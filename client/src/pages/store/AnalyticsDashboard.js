@@ -52,63 +52,53 @@ const AnalyticsDashboard = () => {
 
 
 
-  // Generate static analytics data
-  const generateStaticAnalytics = useCallback((startDate, endDate) => {
-    const now = new Date();
-    const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = endDate ? new Date(endDate) : now;
-    
-    // Calculate days between dates
-    const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-    const daysInRange = Math.min(Math.max(daysDiff, 1), 90); // Limit to 90 days max for performance
-    
-    // Generate hourly data for the current day
-    const hourlyData = Array.from({ length: 24 }, (_, i) => ({
-      hour: `${i}:00`,
-      scans: Math.floor(Math.random() * 50) + 10,
-      sales: Math.floor(Math.random() * 30) + 5,
-    }));
-
-    // Generate daily data for the selected date range
-    const dailyData = Array.from({ length: daysInRange }, (_, i) => {
-      const currentDate = new Date(start);
-      currentDate.setDate(start.getDate() + i);
-      
+  // Format data from API response
+  const formatAnalyticsData = useCallback((data) => {
+    if (!data) {
       return {
-        date: currentDate.toISOString().split('T')[0],
-        scans: Math.floor(Math.random() * 100) + 50,
-        sales: Math.floor(Math.random() * 70) + 30,
+        total_scans: 0,
+        unique_visitors: 0,
+        total_sales: 0,
+        total_orders: 0,
+        conversion_rate: 0,
+        avg_order_value: 0,
+        hourly_data: [],
+        daily_data: [],
+        section_data: [],
+        last_updated: new Date().toISOString(),
       };
-    });
+    }
+    
+    // Format daily data for charts
+    const dailyData = data.sales?.dailyTrend?.map(item => ({
+      date: item.date,
+      scans: data.qrScans?.summary?.total_scans || 0,
+      sales: item.total_sales || 0,
+      orders: item.total_orders || 0
+    })) || [];
 
-    // Section-wise data
-    const sections = [
-      { name: 'Electronics', color: '#8884d8' },
-      { name: 'Fashion', color: '#82ca9d' },
-      { name: 'Home & Kitchen', color: '#ffc658' },
-      { name: 'Beauty', color: '#ff8042' },
-      { name: 'Sports', color: '#0088FE' },
-    ];
+    // Format section data for pie chart
+    const sectionData = data.qrScans?.sectionBreakdown?.map((section, index) => ({
+      name: section.section_name || `Section ${index + 1}`,
+      color: ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE'][index % 5],
+      scans: section.scan_count || 0,
+      sales: 0 // This would need to come from your API
+    })) || [];
 
-    const sectionData = sections.map(section => ({
-      ...section,
-      scans: Math.floor(Math.random() * 500) + 100,
-      sales: Math.floor(Math.random() * 10000) + 2000,
-    }));
-
-    // Calculate metrics
-    const totalScans = sectionData.reduce((sum, section) => sum + section.scans, 0);
-    const totalSales = sectionData.reduce((sum, section) => sum + section.sales, 0);
-    const conversionRate = totalScans > 0 ? (totalSales / totalScans * 100).toFixed(1) : 0;
-    const avgOrderValue = (totalSales / (totalScans * 0.3)).toFixed(2); // Assuming 30% conversion
+    // Format hourly data
+    const hourlyData = data.qrScans?.hourlyDistribution?.map(hour => ({
+      hour: `${hour.hour}:00`,
+      scans: hour.scan_count || 0,
+      sales: 0 // This would need to come from your API
+    })) || [];
 
     return {
-      total_scans: totalScans,
-      unique_visitors: Math.floor(totalScans * 0.7),
-      total_sales: totalSales,
-      total_orders: Math.floor(totalScans * 0.3), // 30% conversion rate
-      conversion_rate: conversionRate,
-      avg_order_value: avgOrderValue,
+      total_scans: data.qrScans?.summary?.total_scans || 0,
+      unique_visitors: data.qrScans?.summary?.unique_visitors || 0,
+      total_sales: data.sales?.summary?.total_revenue || 0,
+      total_orders: data.sales?.summary?.total_orders || 0,
+      conversion_rate: data.conversion?.rate || 0, // Safely access conversion rate with optional chaining
+      avg_order_value: data.sales?.summary?.avg_order_value || 0,
       hourly_data: hourlyData,
       daily_data: dailyData,
       section_data: sectionData,
@@ -139,30 +129,21 @@ const AnalyticsDashboard = () => {
       setLoading(true);
       setError('');
       
-      try {
-        // Try to fetch from API first
-        const params = new URLSearchParams();
-        if (dateRange.start_date) params.append('start_date', dateRange.start_date);
-        if (dateRange.end_date) params.append('end_date', dateRange.end_date);
-        
-        const response = await api.get(`/analytics/dashboard?${params}`);
-        setAnalytics(response.data.data);
-      } catch (apiError) {
-        console.warn('Using static data due to API error:', apiError);
-        // Fallback to static data if API fails
-        const staticData = generateStaticAnalytics(dateRange.start_date, dateRange.end_date);
-        setAnalytics(staticData);
-        setError('Using sample data. Could not connect to the server.');
-      }
+      const params = new URLSearchParams();
+      if (dateRange.start_date) params.append('start_date', dateRange.start_date);
+      if (dateRange.end_date) params.append('end_date', dateRange.end_date);
+      
+      const response = await api.get(`/analytics/dashboard?${params}`);
+      const formattedData = formatAnalyticsData(response.data.data);
+      setAnalytics(formattedData);
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
-      setError('Failed to load analytics data. Using sample data.');
-      const staticData = generateStaticAnalytics(dateRange.start_date, dateRange.end_date);
-      setAnalytics(staticData);
+      setError('Failed to load analytics data. Please try again later.');
+      setAnalytics(null);
     } finally {
       setLoading(false);
     }
-  }, [dateRange.start_date, dateRange.end_date, generateStaticAnalytics]);
+  }, [dateRange.start_date, dateRange.end_date, formatAnalyticsData]);
 
 
   useEffect(() => {
@@ -393,7 +374,7 @@ const AnalyticsDashboard = () => {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Conversion Rate</dt>
-                    <dd className="text-2xl font-bold text-gray-900">{analytics.conversion_rate || '0'}%</dd>
+                    <dd className="text-2xl font-bold text-gray-900">{(analytics?.conversion_rate ?? 0).toFixed(1)}%</dd>
                     <dd className="flex items-center text-sm text-gray-500 mt-1">
                       <ArrowTrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
                       <span>2.1% from last month</span>
@@ -441,7 +422,7 @@ const AnalyticsDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">Conversion Rate</p>
-              <p className="text-2xl font-bold text-gray-900">{analytics.conversion_rate || '0'}%</p>
+              <p className="text-2xl font-bold text-gray-900">{(analytics?.conversion_rate ?? 0).toFixed(1)}%</p>
               <p className="text-sm text-gray-500 mt-1">
                 <span className="text-green-500 font-medium">+2.1%</span> from last month
               </p>
@@ -690,8 +671,8 @@ const AnalyticsDashboard = () => {
             <h4 className="font-medium text-purple-800 mb-2">Conversion Rate</h4>
             <p className="text-sm text-gray-700">
               Your current conversion rate is{' '}
-              <span className="font-semibold">{analytics.conversion_rate || '0'}%</span>.
-              {analytics.conversion_rate > 5 ? (
+              <span className="font-semibold">{(analytics?.conversion_rate ?? 0).toFixed(1)}%</span>.
+              {(analytics?.conversion_rate ?? 0) > 5 ? (
                 <span className="text-green-600"> This is above average!</span>
               ) : (
                 <span> Consider optimizing your offers and CTAs.</span>

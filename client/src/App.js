@@ -20,6 +20,8 @@ import OfferManagement from './pages/store/OfferManagement';
 import AnalyticsDashboard from './pages/store/AnalyticsDashboard';
 import FeedbackManagement from './pages/store/FeedbackManagement';
 import QRCodeManagement from './pages/store/QRCodeManagement';
+import QRCodeDashboard from './pages/store/QRCodeDashboard';
+import SalesDashboard from './pages/store/SalesDashboard';
 
 // Components
 import StoreManagerRoute from './components/StoreManagerRoute';
@@ -50,8 +52,10 @@ function App() {
               <Route path="sections" element={<StoreSections />} />
               <Route path="offers" element={<OfferManagement />} />
               <Route path="analytics" element={<AnalyticsDashboard />} />
+              <Route path="sales" element={<SalesDashboard />} />
               <Route path="feedback" element={<FeedbackManagement />} />
               <Route path="qr-codes" element={<QRCodeManagement />} />
+              <Route path="qrcode-analytics" element={<QRCodeDashboard />} />
             </Route>
             
             {/* Catch all route */}

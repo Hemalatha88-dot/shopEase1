@@ -27,6 +27,13 @@ const HomePage = () => {
                 <p className="text-sm text-gray-500">Smart Shopping Experience</p>
               </div>
             </div>
+            <Link
+              to="/store/1"
+              className="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg border border-gray-200"
+            >
+              <ShoppingBagIcon className="w-5 h-5 mr-2" />
+              Visit Demo Store
+            </Link>
           </div>
         </div>
       </header>

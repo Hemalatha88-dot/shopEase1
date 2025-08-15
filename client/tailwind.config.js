@@ -49,6 +49,17 @@ module.exports = {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
+
+      transitionProperty: {
+        'width': 'width',
+        'spacing': 'margin, padding',
+      },
+    },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['active'],
+      textColor: ['active'],
     },
   },
   plugins: [],

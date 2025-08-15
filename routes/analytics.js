@@ -368,6 +368,123 @@ router.get('/dashboard', authenticateStoreManager, async (req, res) => {
   }
 });
 
+// Get QR code analytics for dashboard
+router.get('/qr-codes', authenticateStoreManager, async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    console.log('QR code analytics request received:', { 
+      storeId: req.user.storeId,
+      query: req.query 
+    });
+    
+    const { start_date, end_date } = req.query;
+    const storeId = req.user.storeId;
+
+    // Build date filter
+    let dateFilter = '';
+    const dateParams = [storeId];
+    if (start_date && end_date) {
+      dateFilter = 'AND DATE(scan_time) BETWEEN ? AND ?';
+      dateParams.push(start_date, end_date);
+    } else if (start_date) {
+      dateFilter = 'AND DATE(scan_time) >= ?';
+      dateParams.push(start_date);
+    } else if (end_date) {
+      dateFilter = 'AND DATE(scan_time) <= ?';
+      dateParams.push(end_date);
+    }
+
+    // Get total scans and unique visitors
+    const [scanStats] = await pool.execute(
+      `SELECT 
+        COUNT(*) as total_scans,
+        COUNT(DISTINCT ip_address) as unique_visitors,
+        CASE 
+          WHEN DATEDIFF(
+            COALESCE(?, CURDATE()), 
+            COALESCE(?, (SELECT MIN(scan_time) FROM qr_scans WHERE store_id = ?))
+          ) > 0 
+          THEN COUNT(*) / DATEDIFF(
+            COALESCE(?, CURDATE()), 
+            COALESCE(?, (SELECT MIN(scan_time) FROM qr_scans WHERE store_id = ?))
+          )
+          ELSE 0 
+        END as avg_scans_per_day
+      FROM qr_scans 
+      WHERE store_id = ? ${dateFilter}`,
+      [
+        end_date || new Date(), 
+        start_date, 
+        storeId,
+        end_date || new Date(),
+        start_date,
+        storeId,
+        ...dateParams
+      ]
+    );
+
+    // Get daily scan trend
+    const [dailyScans] = await pool.execute(
+      `SELECT 
+        DATE(scan_time) as date,
+        COUNT(*) as scans
+      FROM qr_scans
+      WHERE store_id = ? ${dateFilter}
+      GROUP BY DATE(scan_time)
+      ORDER BY date`,
+      [storeId, ...dateParams.slice(1)]
+    );
+
+    // Get hourly distribution
+    const [hourlyDistribution] = await pool.execute(
+      `SELECT 
+        HOUR(scan_time) as hour,
+        COUNT(*) as scans
+      FROM qr_scans
+      WHERE store_id = ? ${dateFilter}
+      GROUP BY HOUR(scan_time)
+      ORDER BY hour`,
+      [storeId, ...dateParams.slice(1)]
+    );
+
+    // Get section breakdown
+    const [sectionBreakdown] = await pool.execute(
+      `SELECT 
+        ss.id as section_id,
+        ss.name as section_name,
+        COUNT(*) as scan_count
+      FROM qr_scans qs
+      LEFT JOIN store_sections ss ON qs.section_id = ss.id
+      WHERE qs.store_id = ? ${dateFilter}
+      GROUP BY ss.id, ss.name
+      ORDER BY scan_count DESC`,
+      [storeId, ...dateParams.slice(1)]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        total_scans: scanStats[0]?.total_scans || 0,
+        unique_visitors: scanStats[0]?.unique_visitors || 0,
+        avg_scans_per_day: scanStats[0]?.avg_scans_per_day || 0,
+        daily_scans: dailyScans,
+        hourly_distribution: hourlyDistribution,
+        section_breakdown: sectionBreakdown
+      }
+    });
+
+  } catch (error) {
+    console.error('Get QR code analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch QR code analytics',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
 // Get QR scan analytics
 router.get('/qr-scans', authenticateStoreManager, async (req, res) => {
   try {
