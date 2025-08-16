@@ -39,7 +39,7 @@ const OfferManagement = () => {
 
   const categories = [
     'Jewelry', 'Fashion', 'Shoes', 'Jeans', 'Kids', 'Toys', 
-    'Electronics', 'Home & Garden', 'Sports', 'Beauty', 'Books'
+    'Electronics', 'Home & Garden', 'Sports', 'Beauty', 'Books', 'Fruits', 'Groceries', 'Health'
   ];
 
   const subcategories = {
@@ -272,7 +272,7 @@ const OfferManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Section *</label>
+                  <label className="block text-sm font-medium text-gray-700">Sub Store *</label>
                   <select
                     name="section_id"
                     value={formData.section_id}
@@ -280,7 +280,7 @@ const OfferManagement = () => {
                     required
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   >
-                    <option value="">Select a Section</option>
+                    <option value="">Select a Sub Store</option>
                     {sections.map(section => (
                       <option key={section.id} value={section.id}>{section.name}</option>
                     ))}

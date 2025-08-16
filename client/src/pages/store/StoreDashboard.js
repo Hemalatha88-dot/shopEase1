@@ -627,7 +627,7 @@ const StoreDashboard = () => {
 
             {/* Scans by Section */}
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Scans by Section</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Scans by Sub Store</h4>
               <div className="space-y-2">
                 {Object.entries(stats.scanAnalytics.bySection).map(([section, count]) => (
                   <div key={section} className="flex items-center justify-between text-sm">

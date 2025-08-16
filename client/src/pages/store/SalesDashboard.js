@@ -103,11 +103,11 @@ const SalesDashboard = () => {
     }));
 
     // Process top products (example - would need product data from your API)
-    const topProducts = [
-      { name: 'Product A', sales: 45, revenue: 1250 },
-      { name: 'Product B', sales: 32, revenue: 980 },
-      { name: 'Product C', sales: 28, revenue: 780 }
-    ];
+    // const topProducts = [
+    //   { name: 'Product A', sales: 45, revenue: 1250 },
+    //   { name: 'Product B', sales: 32, revenue: 980 },
+    //   { name: 'Product C', sales: 28, revenue: 780 }
+    // ];
 
     // Process payment methods (example - would need payment data from your API)
     const paymentMethods = [
@@ -127,7 +127,7 @@ const SalesDashboard = () => {
         growthRate
       },
       dailySales,
-      topProducts,
+      // topProducts,
       paymentMethods
     };
   };
@@ -228,7 +228,7 @@ const SalesDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {/* Total Revenue */}
         <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
           <div className="p-5">
@@ -293,7 +293,7 @@ const SalesDashboard = () => {
         </div>
 
         {/* Top Selling Product */}
-        <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+        {/* <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
           <div className="p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -310,7 +310,7 @@ const SalesDashboard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Charts Row 1 */}
@@ -427,7 +427,7 @@ const SalesDashboard = () => {
       </div>
 
       {/* Top Products Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+      {/* <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <h3 className="text-lg leading-6 font-medium text-gray-900">Top Selling Products</h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">Best performing products by sales volume</p>
@@ -477,7 +477,7 @@ const SalesDashboard = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
 
       {/* Recent Transactions */}
       {/* <div className="bg-white shadow overflow-hidden sm:rounded-lg">

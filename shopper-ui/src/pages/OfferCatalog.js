@@ -46,8 +46,15 @@ const OfferCatalog = () => {
         
         setOffers(offersData);
         
-        // Extract unique categories
-        const uniqueCategories = [...new Set(offersData.map(offer => offer.category).filter(Boolean))];
+        // Extract unique categories (normalize to strings to avoid 8 vs "8" duplicates)
+        const uniqueCategories = [
+          ...new Set(
+            offersData
+              .map(offer => offer.category)
+              .filter(v => v !== null && v !== undefined && v !== '')
+              .map(v => String(v).trim())
+          )
+        ];
         setCategories(uniqueCategories);
         
         // Extract unique stores
@@ -81,7 +88,7 @@ const OfferCatalog = () => {
     }
     
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(offer => offer.category === selectedCategory);
+      filtered = filtered.filter(offer => String(offer.category) === selectedCategory);
     }
     
     if (searchTerm) {
@@ -230,7 +237,7 @@ const OfferCatalog = () => {
               >
                 <option value="all">All Categories</option>
                 {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={`cat-${category}`} value={category}>{category}</option>
                 ))}
               </select>
             </div>
@@ -252,7 +259,7 @@ const OfferCatalog = () => {
             </button>
             {categories.map(category => (
               <button
-                key={category}
+                key={`pill-${category}`}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
