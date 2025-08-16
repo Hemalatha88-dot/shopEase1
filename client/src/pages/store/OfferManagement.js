@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
 import {
@@ -21,6 +21,14 @@ const OfferManagement = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [bulkSectionId, setBulkSectionId] = useState('');
   const [error, setError] = useState('');
+
+  // Fast lookup for section name by id
+  const sectionById = useMemo(() => {
+    return sections.reduce((acc, s) => {
+      acc[s.id] = s;
+      return acc;
+    }, {});
+  }, [sections]);
 
   // Form state for manual entry
   const [formData, setFormData] = useState({
@@ -470,14 +478,13 @@ const OfferManagement = () => {
         </div>
       )}
 
-      {/* Offers List */}
+      {/* Offers Table */}
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
             Current Offers ({offers.length})
           </h3>
         </div>
-        
         {offers.length === 0 ? (
           <div className="text-center py-12">
             <DocumentArrowUpIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -485,70 +492,66 @@ const OfferManagement = () => {
             <p className="mt-1 text-sm text-gray-500">Get started by creating your first offer.</p>
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
-            {offers.map((offer) => (
-              <li key={offer.id} className="px-4 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {offer.image_url && (
-                      <img 
-                        src={offer.image_url} 
-                        alt={offer.title}
-                        className="h-16 w-16 rounded-lg object-cover"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
-                          {offer.title}
-                        </h4>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          offer.is_active 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {offer.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 truncate">{offer.description}</p>
-                      <div className="flex items-center space-x-4 mt-1">
-                        <span className="text-sm text-gray-500">
-                          <span className="line-through">₹{offer.original_price}</span>
-                          <span className="ml-2 font-medium text-green-600">₹{offer.offer_price}</span>
-                        </span>
-                        <span className="text-sm text-gray-500">{offer.category}</span>
-                        {offer.subcategory && (
-                          <span className="text-sm text-gray-500">{offer.subcategory}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    {/* <button
-                      onClick={() => toggleOfferStatus(offer.id, offer.is_active)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      {offer.is_active ? (
-                        <EyeSlashIcon className="h-5 w-5" />
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th> */}
+                  {/* <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th> */}
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Store</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Original</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Offer</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {offers.map((offer) => (
+                  <tr key={offer.id} className="align-top">
+                    <td className="px-4 py-3">
+                      {offer.image_url ? (
+                        <img
+                          src={offer.image_url}
+                          alt={offer.title}
+                          className="h-16 w-16 rounded-lg object-cover"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
                       ) : (
-                        <EyeIcon className="h-5 w-5" />
+                        <div className="h-16 w-16 rounded-lg bg-gray-100 border border-gray-200" />
                       )}
-                    </button> */}
-                    <button
-                      onClick={() => deleteOffer(offer.id)}
-                      className="text-red-400 hover:text-red-600"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{offer.title}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">{offer.description}</td>
+                    {/* <td className="px-4 py-3 text-sm text-gray-700">{offer.category}</td> */}
+                    {/* <td className="px-4 py-3 text-sm text-gray-700">{offer.subcategory || '-'}</td> */}
+                    <td className="px-4 py-3 text-sm text-gray-700">{sectionById[offer.section_id]?.name || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 line-through">₹{offer.original_price}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-green-600">₹{offer.offer_price}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{offer.discount_percentage ? `${offer.discount_percentage}%` : '-'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${offer.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {offer.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        {/* <button onClick={() => toggleOfferStatus(offer.id, offer.is_active)} className="text-gray-400 hover:text-gray-600">
+                          {offer.is_active ? (<EyeSlashIcon className="h-5 w-5" />) : (<EyeIcon className="h-5 w-5" />)}
+                        </button> */}
+                        <button onClick={() => deleteOffer(offer.id)} className="text-red-400 hover:text-red-600">
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

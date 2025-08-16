@@ -104,7 +104,7 @@ const OfferCatalog = () => {
   const isUserAuthenticated = isAuthenticated;
   // Show only 3 offers initially for unauthenticated users
   const visibleOffers = isUserAuthenticated ? filteredOffers : filteredOffers.slice(0, 3);
-  const hasMoreOffers = filteredOffers.length > 3;
+  const hasMoreOffers = filteredOffers.length > 3 && !isUserAuthenticated;
 
   // Scroll detection for registration popup
   useEffect(() => {
@@ -390,13 +390,14 @@ const OfferCatalog = () => {
                       setShowScrollPopup(false);
                       navigate('/customer/auth', { 
                         state: { 
-                          redirectTo: `/offers/${resolvedStoreId}${resolvedSectionId ? `/section/${resolvedSectionId}` : ''}` 
+                          redirectTo: `/offers/${resolvedStoreId}${resolvedSectionId ? `/section/${resolvedSectionId}` : ''}`,
+                          fromQR: true
                         } 
                       });
                     }}
                     className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-6 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
                   >
-                    Register Now - It's Free! 🚀
+                    {isUserAuthenticated ? 'View All Offers' : 'Register Now - It\'s Free! 🚀'}
                   </button>
                   
                   <button
@@ -408,7 +409,7 @@ const OfferCatalog = () => {
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-4">
-                  Quick signup • Just name, email & mobile • OTP verification
+                  {isUserAuthenticated ? 'Loading all available offers...' : 'Quick signup • Just name, email & mobile • OTP verification'}
                 </p>
               </div>
             </div>

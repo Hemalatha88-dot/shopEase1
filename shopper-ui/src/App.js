@@ -8,6 +8,7 @@ import StoreLanding from './pages/StoreLanding';
 import OfferCatalog from './pages/OfferCatalog';
 import CustomerAuth from './pages/CustomerAuth';
 import FeedbackForm from './pages/FeedbackForm';
+import QRCodeLanding from './pages/QRCodeLanding';
 
 // Shopper Context
 import { ShopperProvider } from './contexts/ShopperContext';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/auth/:storeId" element={<CustomerAuth />} />
             <Route path="/customer/auth" element={<CustomerAuth />} />
             <Route path="/feedback/:storeId" element={<FeedbackForm />} />
+            <Route path="/q/:storeId" element={<QRCodeLanding />} />
           </Routes>
           <Toaster 
             position="top-right"
