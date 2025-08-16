@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Prefer explicit env; otherwise, build from current host so mobile devices don't hit "localhost"
+const API_URL = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}:5000/api`;
 
 const api = axios.create({
   baseURL: API_URL,

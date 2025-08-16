@@ -52,7 +52,7 @@ const StoreManagerSidebar = ({ isMobile = false }) => {
   const navigation = [
     { name: 'Dashboard', href: '/store-manager/dashboard', icon: HomeIcon },
     { name: 'Profile', href: '/store-manager/profile', icon: UserIcon },
-    { name: 'Sections', href: '/store-manager/sections', icon: Squares2X2Icon },
+    { name: 'Sub Store', href: '/store-manager/sections', icon: Squares2X2Icon },
     { name: 'Offers', href: '/store-manager/offers', icon: TagIcon },
     {name: 'Sales', href: '/store-manager/sales', icon: ChartBarIcon},
     // { name: 'Analytics', href: '/store-manager/analytics', icon: ChartBarIcon },

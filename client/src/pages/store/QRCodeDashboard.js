@@ -261,7 +261,7 @@ const QRCodeDashboard = () => {
         </div>
 
         {/* Hourly Distribution Bar Chart */}
-        <div className="bg-white p-6 rounded-lg shadow">
+        {/* <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Hourly Distribution</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -275,7 +275,40 @@ const QRCodeDashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div> */}
+
+
+
+         {/* Scans by Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-0">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Scans by Section</h3>
+          <div className="space-y-8">
+            {analytics.section_breakdown && analytics.section_breakdown.length > 0 ? (
+              analytics.section_breakdown.map((section) => (
+                <div key={section.section_id} className="mb-2">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">{section.section_name}</span>
+                    <span className="font-medium">{section.scan_count?.toLocaleString() || '0'}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full" 
+                      style={{
+                        width: `${(section.scan_count / analytics.total_scans * 100) || 0}%`,
+                        minWidth: '0.5rem',
+                        maxWidth: '100%'
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No section data available</p>
+            )}
+          </div>
         </div>
+      </div>
       </div>
 
       {/* Section Breakdown */}
@@ -347,36 +380,7 @@ const QRCodeDashboard = () => {
         </div>
       </div> */}
 
-      {/* Scans by Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Scans by Section</h3>
-          <div className="space-y-3">
-            {analytics.section_breakdown && analytics.section_breakdown.length > 0 ? (
-              analytics.section_breakdown.map((section) => (
-                <div key={section.section_id} className="mb-2">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">{section.section_name}</span>
-                    <span className="font-medium">{section.scan_count?.toLocaleString() || '0'}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{
-                        width: `${(section.scan_count / analytics.total_scans * 100) || 0}%`,
-                        minWidth: '0.5rem',
-                        maxWidth: '100%'
-                      }}
-                    />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No section data available</p>
-            )}
-          </div>
-        </div>
-      </div>
+     
 
       {/* All Scans Table */}
       <div className="bg-white p-6 rounded-lg shadow mb-8">

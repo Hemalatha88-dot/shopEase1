@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
 import api, { setAuthToken } from '../services/api';
 
 const AuthContext = createContext();
@@ -102,7 +101,7 @@ export const AuthProvider = ({ children }) => {
 
   const storeManagerRegister = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      const response = await api.post('/auth/register', userData);
       
       const { token: newToken } = response.data.data;
 
@@ -144,7 +143,7 @@ export const AuthProvider = ({ children }) => {
   // Customer Authentication
   const customerRegister = async (customerData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/customer/register', customerData);
+      const response = await api.post('/auth/customer/register', customerData);
       return { success: true, data: response.data.data };
     } catch (error) {
       return { 
@@ -156,7 +155,7 @@ export const AuthProvider = ({ children }) => {
 
   const customerVerifyOTP = async (phone, otp) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/customer/verify-otp', {
+      const response = await api.post('/auth/customer/verify-otp', {
         phone,
         otp
       });
@@ -178,7 +177,7 @@ export const AuthProvider = ({ children }) => {
 
   const resendOTP = async (phone) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/customer/resend-otp', {
+      const response = await api.post('/auth/customer/resend-otp', {
         phone
       });
       return { success: true, data: response.data.data };

@@ -132,8 +132,8 @@ const StoreSections = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Store Sections</h1>
-          <p className="text-gray-600">Manage your store sections and generate QR codes for each section</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Sub Stores</h1>
+          <p className="text-gray-600">Manage your Sub Stores and generate QR codes for each Sub Store</p>
         </div>
         <button
           onClick={() => {
@@ -143,7 +143,7 @@ const StoreSections = () => {
           className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
         >
           <PlusIcon className="h-5 w-5" />
-          <span>Add Section</span>
+          <span>Add Sub Store</span>
         </button>
       </div>
 
@@ -163,7 +163,7 @@ const StoreSections = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Section Name *
+                Sub Store Name *
               </label>
               <input
                 type="text"
@@ -195,7 +195,7 @@ const StoreSections = () => {
                 type="submit"
                 className="bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition-colors"
               >
-                {editingSection ? 'Update Section' : 'Create Section'}
+                {editingSection ? 'Update Sub Store' : 'Create Sub Store'}
               </button>
               <button
                 type="button"
@@ -216,7 +216,7 @@ const StoreSections = () => {
       <div className="bg-white rounded-lg shadow-md">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            Current Sections ({sections.length})
+            Current Sub Stores ({sections.length})
           </h3>
         </div>
         
@@ -225,7 +225,7 @@ const StoreSections = () => {
             <BuildingStorefrontIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No sections created yet</h3>
             <p className="text-gray-500 mb-4">
-              Create your first store section to organize your offers and products
+              Create your first sub store to organize your offers and products
             </p>
             <button
               onClick={() => {
@@ -234,7 +234,7 @@ const StoreSections = () => {
               }}
               className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
             >
-              Create First Section
+              Create First SubStore
             </button>
           </div>
         ) : (
@@ -288,10 +288,10 @@ const StoreSections = () => {
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h4 className="text-lg font-semibold text-blue-900 mb-3">Quick Setup Guide</h4>
           <div className="space-y-2 text-sm text-blue-800">
-            <p><strong>Step 1:</strong> Create store sections (e.g., Electronics, Clothing, Groceries)</p>
+            <p><strong>Step 1:</strong> Create Sub store (e.g., Electronics, Clothing, Groceries)</p>
             <p><strong>Step 2:</strong> Add offers/products and assign them to sections</p>
             <p><strong>Step 3:</strong> Generate QR codes for each section</p>
-            <p><strong>Step 4:</strong> Place QR codes in respective store sections</p>
+            <p><strong>Step 4:</strong> Place QR codes in respective Sub store</p>
           </div>
         </div>
       )}

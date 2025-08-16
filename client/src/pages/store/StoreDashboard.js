@@ -197,8 +197,8 @@ const StoreDashboard = () => {
       color: 'bg-blue-500'
     },
     {
-      title: 'Create Section',
-      description: 'Add a new section to your store',
+      title: 'Create Sub Store',
+      description: 'Add a new sub store to your store',
       icon: QrCodeIcon,
       href: '/store-manager/sections',
       color: 'bg-green-500'
@@ -298,9 +298,9 @@ const StoreDashboard = () => {
           <div className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Store Sections</p>
+                <p className="text-sm font-medium text-gray-500">Sub Stores</p>
                 <p className="text-2xl font-semibold text-gray-900">{stats.totalSections}</p>
-                <p className="text-xs text-gray-500 mt-1">Active sections</p>
+                <p className="text-xs text-gray-500 mt-1">Active Sub Stores</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg">
                 <QrCodeIcon className="h-6 w-6 text-green-600" />
@@ -311,7 +311,7 @@ const StoreDashboard = () => {
                 to="/store-manager/sections" 
                 className="text-sm text-green-600 hover:text-green-800 font-medium flex items-center"
               >
-                Manage sections
+                Manage Sub Stores
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
