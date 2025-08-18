@@ -255,7 +255,7 @@ const QRCodeManagement = () => {
 
     // Define your local IP here for frontend consistency
     // This will be passed to the backend for QR code generation
-    const LOCAL_FRONTEND_URL = 'http://192.168.0.110:3000'; 
+    const LOCAL_FRONTEND_URL = 'http://192.168.0.103:3000'; 
 
     const fetchQRCodes = useCallback(async () => {
         if (!user || !user.storeId) { // Ensure user and a selected store are available

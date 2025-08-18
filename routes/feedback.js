@@ -7,6 +7,85 @@ const router = express.Router();
 
 // Existing routes...
 
+// Submit feedback
+router.post('/', optionalAuth, [
+  body('store_id').isInt().withMessage('Valid store ID is required'),
+  body('overall_rating').isInt({ min: 1, max: 5 }).withMessage('Overall rating must be between 1 and 5'),
+  body('service_rating').optional().isInt({ min: 1, max: 5 }).withMessage('Service rating must be between 1 and 5'),
+  body('product_rating').optional().isInt({ min: 1, max: 5 }).withMessage('Product rating must be between 1 and 5'),
+  body('cleanliness_rating').optional().isInt({ min: 1, max: 5 }).withMessage('Cleanliness rating must be between 1 and 5'),
+  body('value_rating').optional().isInt({ min: 1, max: 5 }).withMessage('Value rating must be between 1 and 5'),
+  body('comments').optional().trim().isLength({ max: 1000 }).withMessage('Comments must be less than 1000 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const {
+      store_id, overall_rating, service_rating, product_rating,
+      cleanliness_rating, value_rating, comments
+    } = req.body;
+
+    // Verify store exists
+    const [stores] = await pool.execute(
+      'SELECT id FROM stores WHERE id = ?',
+      [store_id]
+    );
+
+    if (stores.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Store not found'
+      });
+    }
+
+    // Insert feedback
+    const [result] = await pool.execute(
+      `INSERT INTO feedback (
+        store_id, customer_id, overall_rating, service_rating, product_rating,
+        cleanliness_rating, value_rating, comments
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        store_id,
+        req.user?.customerId || null,
+        overall_rating,
+        service_rating || null,
+        product_rating || null,
+        cleanliness_rating || null,
+        value_rating || null,
+        comments || null
+      ]
+    );
+
+    const feedbackId = result.insertId;
+
+    // Get the created feedback
+    const [feedback] = await pool.execute(
+      'SELECT * FROM feedback WHERE id = ?',
+      [feedbackId]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Feedback submitted successfully',
+      data: feedback[0]
+    });
+
+  } catch (error) {
+    console.error('Submit feedback error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to submit feedback'
+    });
+  }
+});
+
 // Get feedback for a store (store manager)
 router.get('/store/:storeId', async (req, res) => {
   try {

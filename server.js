@@ -35,8 +35,8 @@ app.use(limiter);
 // }));
 
 app.use(cors({
-  // origin: ['http://localhost:3000', 'http://localhost:3001'], // Add all your frontend URLs
-  origin: '*',
+  origin: ['http://localhost:3000', 'http://localhost:3001'], // Add all your frontend URLs
+  // origin: '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

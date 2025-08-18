@@ -619,7 +619,7 @@ router.post('/store/:storeId/generate-main', authenticateToken, async (req, res)
 
         // If URL is not provided by the frontend, construct it using the current IP address
         if (!url) {
-            const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.110:3000'; // Set your actual local IP here
+            const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.103:3000'; // Set your actual local IP here
             url = `${frontendUrl}/store/${storeId}/public`; // QR code points to a public view of the store
         }
 
@@ -668,7 +668,7 @@ router.post('/store/:storeId/section/:sectionId/generate', authenticateStoreMana
         let { url } = req.body;
 
         if (!url) {
-            const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.110:3000'; // Set your actual local IP here
+            const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.0.103:3000'; // Set your actual local IP here
             url = `${frontendUrl}/store/${storeId}/section/${sectionId}/public`; // QR code points to a public view of the section
         }
 
